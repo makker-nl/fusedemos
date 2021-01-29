@@ -1,0 +1,6 @@
+# AnimalOrder Service
+  aOSvc:
+       address: /FuseDemos/AnimalOrderService
+#AnimalQuote Service
+  aQSvc:
+       address: http://rhfuse.conclusion.local:8089/fuse/demo/mockAnimalQuote

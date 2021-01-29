@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:cxf="http://camel.apache.org/schema/cxf"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+	                    http://camel.apache.org/schema/cxf https://camel.apache.org/schema/cxf/camel-cxf.xsd
+	                    http://camel.apache.org/schema/spring https://camel.apache.org/schema/spring/camel-spring.xsd">
+	                    <!-- aOSvc.address in applicatin-dev.yml -->
+	<cxf:cxfEndpoint id="animalOrderSOAPEndpoint"
+		xmlns:tns="http://xmlns.vs.nl/fuse/demo/wsdl/AnimalOrders"
+		address="${aOSvc.address}" wsdlURL="WSDLs/AnimalOrderService.wsdl"
+		endpointName="tns:order_pttPort" serviceName="tns:order_ptt"
+		serviceClass="nl.virtualsciences.fuse.soap.soaptosoap.webservices.AnimalOrderServiceProvider">
+		<cxf:properties>
+			<entry key="dataFormat" value="PAYLOAD" />
+		</cxf:properties>
+	</cxf:cxfEndpoint>
+	<cxf:cxfEndpoint id="animalQuoteSOAPEndpoint" xmlns:tns="http://xmlns.vs.nl/fuse/demo/wsdl/animalquoteservice"
+		address="${aQSvc.address}" wsdlURL="WSDLs/AnimalQuoteService.wsdl"
+		endpointName="tns:AnimalQuote_pttPort" serviceName="tns:AnimalQuoteService"
+		serviceClass="nl.virtualsciences.fuse.soap.soaptosoap.webservices.AnimalQuoteServiceProvider">
+		<cxf:properties>
+			<entry key="dataFormat" value="PAYLOAD" />
+		</cxf:properties>
+	</cxf:cxfEndpoint>
+</beans>

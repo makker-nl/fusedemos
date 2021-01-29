@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd                  http://camel.apache.org/schema/spring https://camel.apache.org/schema/spring/camel-spring.xsd">
+    <import resource="classpath:spring/camel-cxf.xml"/>
+    <import resource="classpath:spring/camel-beans.xml"/>
+    <!-- CXF Example: https://people.apache.org/~dkulp/camel/cxf-example.html -->
+    <camelContext id="camel"
+        xmlns="http://camel.apache.org/schema/spring"
+        xmlns:anim="http://xmlns.vs.nl/fuse/demo/xsd/AnimalOrders" xmlns:anqt="http://xmlns.vs.nl/fuse/demo/xsd/animalquotes">
+        <route id="SOAP-route">
+            <from id="_fromAnimalOrderSOAP" uri="cxf:bean:animalOrderSOAPEndpoint"/>
+            <log id="_log_FromAnimOrderReqSOAPBody" loggingLevel="INFO" message="The body of the Animal Order request is: ${body}"/>
+            <setProperty id="_saveAnimalOrderRequest" propertyName="AnimalOrderRequest">
+                <simple>${body}</simple>
+            </setProperty>
+            <to id="_toAnimalOrderRequest2Response" uri="xslt:Transformations/AnimalOrderRequestToAnimalOrderResponse.xsl"/>
+            <log id="_log_TransfAnimOrderResp" loggingLevel="INFO" message="The body of the prebuild Animal Order response is: ${body}"/>
+            <unmarshal id="_unmarshalAnimalOrderResponse">
+                <jaxb contextPath="nl.vs.xmlns.fuse.demo.xsd.animalorders"/>
+            </unmarshal>
+            <setProperty id="_saveAnimalOrderResponse" propertyName="AnimalOrderResponse">
+                <simple>${body}</simple>
+            </setProperty>
+            <setBody id="_setBodyBack2AggrAnimalOrderRequest">
+                <simple>${property.AnimalOrderRequest}</simple>
+            </setBody>
+            <unmarshal id="_unmarshalAnimalOrderRequest">
+                <jaxb contextPath="nl.vs.xmlns.fuse.demo.xsd.animalorders"/>
+            </unmarshal>
+            <split id="_splitAnimalOrderRequestLines" strategyRef="animalOrderlineAggregationStrategy">
+                <method method="splitOrderlines" ref="animalOrdersRequestBean"/>
+                <to id="_toProcessOrderLine" uri="direct:orderLine"/>
+            </split>
+            <to id="_toSendAnimalOrderResponse" uri="direct:sendAnimalOrderResponse"/>
+        </route>
+        <route id="_processOrderLine">
+            <from id="_fromOrderLine" uri="direct:orderLine"/>
+            <log id="_logOrderLine" loggingLevel="INFO" message="The body of the Animal Order request OrderLine is: ${body},\n ==> animal id: ${body.article.id}, quantity: ${body.quantity}."/>
+            <setHeader headerName="articleId" id="_setHdrArticleId">
+                <simple>${body.article.id}</simple>
+            </setHeader>
+            <setHeader headerName="quantity" id="_setHdrQuantity">
+                <simple>${body.quantity}</simple>
+            </setHeader>
+            <setBody id="_setBodyToAnimalOrderRequest">
+                <simple>${property.AnimalOrderRequest}</simple>
+            </setBody>
+            <to id="_toAnimalOrderReq2AnimalQuoteReqDOM" uri="xslt:Transformations/AnimalOrderRequestToAnimalQuoteRequest.xsl?output=DOM"/>
+            <!-- Het is belangrijk om de operationName en operationNameSpace te zetten. 
+				Deze zijn namelijk gezet vanuit de ontvangende endpoint. Dus je moet die 
+				overschrijven. Het zetten als endpoint parameter is dus niet voldoende. -->
+            <setHeader headerName="operationName" id="_setOperationName">
+                <constant>quote</constant>
+            </setHeader>
+            <setHeader headerName="operationNameSpace" id="_setOperationNameSpace]">
+                <constant>http://xmlns.vs.nl/fuse/demo/wsdl/animalquoteservice</constant>
+            </setHeader>
+            <setHeader headerName="SOAPAction" id="_setOperationNameSpace]">
+                <constant>http://xmlns.vs.nl/fuse/demo/wsdl/animalquoteservice/quote</constant>
+            </setHeader>
+            <log id="_logAnimalQuoteRequest" loggingLevel="INFO" message="The body of the Animal Quote request: ${body}."/>
+            <to id="_toAnimalQuoteSOAP" uri="cxf:bean:animalQuoteSOAPEndpoint"/>
+            <log id="_logAnimalQuoteResp" loggingLevel="INFO" message="The body of the Animal Quote response: ${body}."/>
+            <to id="_toAnimalQuoteRespToAnimalOrderRespDOM" uri="xslt:Transformations/AnimalQuoteResponseToAnimalOrderRespones.xsl"/>
+            <log id="_logAggrAnimalOrderResp1" loggingLevel="INFO" message="The body of the aggregated Animal Order response: ${body}."/>
+            <unmarshal id="_unmarshalQuoteToAnimalOrderResp">
+                <jaxb contextPath="nl.vs.xmlns.fuse.demo.xsd.animalorders"/>
+            </unmarshal>
+            <setProperty id="_setHdrAggrAnimalOrderLineResponse" propertyName="AnimalOrderLineResponse">
+                <simple>${body.animalOrder.orderlines.orderline[0]}</simple>
+            </setProperty>
+            <log id="_logAggrAnimalOrderResp2" loggingLevel="INFO" message="The body of the aggregated Animal Order response: ${body}."/>
+        </route>
+        <route id="_SendAnimalOrderResponse">
+            <from id="_fromSendAnimalOrderResponse" uri="direct:sendAnimalOrderResponse"/>
+            <setBody id="_setBodyToAnimalOrderResponse">
+                <simple>${property.AnimalOrderResponse}</simple>
+            </setBody>
+            <marshal id="_marshalAnimalOrderResponse">
+                <jaxb
+                    contextPath="nl.vs.xmlns.fuse.demo.xsd.animalorders" schemaSeverityLevel="2"/>
+            </marshal>
+            <convertBodyTo id="_convertBodyToDOM" type="org.w3c.dom.Document"/>
+        </route>
+    </camelContext>
+</beans>

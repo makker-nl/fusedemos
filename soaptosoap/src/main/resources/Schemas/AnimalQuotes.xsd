@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:aniq="http://xmlns.vs.nl/fuse/demo/xsd/animalquotes"
+            targetNamespace="http://xmlns.vs.nl/fuse/demo/xsd/animalquotes" elementFormDefault="qualified">
+  <xsd:element name="animalQuoteRequest" type="aniq:AnimalQuoteRequestType"/>
+  <xsd:complexType name="AnimalQuoteRequestType">
+    <xsd:sequence>
+      <xsd:element name="animalId" type="aniq:animalIdType"/>
+      <xsd:element name="quantity" type="xsd:integer"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:element name="animalQuoteResponse" type="aniq:AnimalQuoteResponseType"/>
+  <xsd:complexType name="AnimalQuoteResponseType">
+    <xsd:sequence>
+      <xsd:element ref="aniq:animalQuote"/>
+      <xsd:element name="result" type="xsd:string"/>
+      <xsd:element name="message" type="xsd:string" maxOccurs="1" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:element name="animalQuote" type="aniq:AnimalQuoteType">
+    <xsd:annotation>
+      <xsd:documentation>A sample element</xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:complexType name="AnimalQuoteType">
+    <xsd:sequence>
+      <xsd:element ref="aniq:animal"/>
+      <xsd:element name="price" type="xsd:decimal"/>
+      <xsd:element name="quantityInStock" type="xsd:integer"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:element name="animal" type="aniq:AnimalType"/>
+  <xsd:complexType name="AnimalType">
+    <xsd:sequence>
+      <xsd:element name="id" type="aniq:animalIdType"/>
+      <xsd:element name="name" type="xsd:string"/>
+      <xsd:element name="countryOfOrigin" type="xsd:string"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:simpleType name="animalIdType">
+    <xsd:restriction base="xsd:string"/>
+  </xsd:simpleType>
+</xsd:schema>
