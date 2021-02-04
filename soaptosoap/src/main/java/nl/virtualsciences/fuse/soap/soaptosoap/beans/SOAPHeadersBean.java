@@ -58,8 +58,8 @@ public class SOAPHeadersBean {
 		log.debug(methodName+": Start");
 		initHeaders(in);
 		SessionHeaderType sessionHeader = new SessionHeaderType();
-		String sforceSessionId = (String) in.getHeader(SESSIONID_MSGHDR);
-		sessionHeader.setSessionId(sforceSessionId);
+		String sessionId = (String) in.getHeader(SESSIONID_MSGHDR);
+		sessionHeader.setSessionId(sessionId);
 		addSoapHeader(in, ANIMALQUOTE_TNS, sessionHeader);
 		log.debug(methodName+": End");
 	}
