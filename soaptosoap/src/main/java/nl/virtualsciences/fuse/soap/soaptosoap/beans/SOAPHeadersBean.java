@@ -32,7 +32,7 @@ public class SOAPHeadersBean {
 		log.debug(methodName+": End");
 	}
 
-	public void addSoapHeader(Message in, String targetNameSpace, Object soapHeaderContent, Class<?> headerClass) throws Exception {
+	public void addSoapHeader(Message in, String targetNameSpace, Object soapHeaderContent) throws Exception {
 		final String methodName="setSoapHeader";
 		log.debug(methodName+": Start");
 		if (in.getHeader(Header.HEADER_LIST) == null) {
@@ -43,7 +43,7 @@ public class SOAPHeadersBean {
 		try {
 			log.debug(methodName+": Create a soap header");
 			SoapHeader soapHeader = new SoapHeader(new QName(targetNameSpace, SESSION_SOAPHDR), soapHeaderContent,
-					new JAXBDataBinding(headerClass));
+					new JAXBDataBinding(soapHeaderContent.getClass()));
 			soapHeader.setDirection(Direction.DIRECTION_OUT);
 			soapHeader.setMustUnderstand(true);
 			soapHeaders.add(soapHeader);
@@ -60,7 +60,7 @@ public class SOAPHeadersBean {
 		SessionHeaderType sessionHeader = new SessionHeaderType();
 		String sforceSessionId = (String) in.getHeader(SESSIONID_MSGHDR);
 		sessionHeader.setSessionId(sforceSessionId);
-		addSoapHeader(in, ANIMALQUOTE_TNS, sessionHeader, SessionHeaderType.class);
+		addSoapHeader(in, ANIMALQUOTE_TNS, sessionHeader);
 		log.debug(methodName+": End");
 	}
 
