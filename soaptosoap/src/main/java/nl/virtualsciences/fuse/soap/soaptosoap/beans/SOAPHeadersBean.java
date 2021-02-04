@@ -27,7 +27,7 @@ public class SOAPHeadersBean {
 	public void initHeaders(Message in) throws Exception {
 		final String methodName="initHeaders";
 		log.debug(methodName+": Start");
-		log.debug(methodName+": Init heeder "+Header.HEADER_LIST);
+		log.debug(methodName+": Init header "+Header.HEADER_LIST);
 		in.setHeader(Header.HEADER_LIST, new ArrayList<SoapHeader>());
 		log.debug(methodName+": End");
 	}
