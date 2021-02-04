@@ -14,4 +14,7 @@
 	<bean
 		class="nl.virtualsciences.fuse.soap.soaptosoap.aggregationstrategies.AnimalOrderlineAggregationStrategy"
 		id="animalOrderlineAggregationStrategy" />		
+	<bean
+		class="nl.virtualsciences.fuse.soap.soaptosoap.beans.SOAPHeadersBean"
+		id="soapHeadersBean" />
 </beans>

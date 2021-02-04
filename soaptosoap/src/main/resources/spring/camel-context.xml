@@ -59,6 +59,10 @@
                 <constant>http://xmlns.vs.nl/fuse/demo/wsdl/animalquoteservice/quote</constant>
             </setHeader>
             <log id="_logAnimalQuoteRequest" loggingLevel="INFO" message="The body of the Animal Quote request: ${body}."/>
+            <setHeader headerName="animalQuoteSessionId" id="_setHdrSessionId">
+                <simple>ID-${date:now:yyyyMMddHHmmss}-12345</simple>                
+            </setHeader>
+            <bean id="setAnimalQuoteSessionId" method="setAnimalQuoteSessionId" ref="soapHeadersBean"/>
             <to id="_toAnimalQuoteSOAP" uri="cxf:bean:animalQuoteSOAPEndpoint"/>
             <log id="_logAnimalQuoteResp" loggingLevel="INFO" message="The body of the Animal Quote response: ${body}."/>
             <to id="_toAnimalQuoteRespToAnimalOrderRespDOM" uri="xslt:Transformations/AnimalQuoteResponseToAnimalOrderRespones.xsl"/>
